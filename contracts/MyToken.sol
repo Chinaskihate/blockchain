@@ -5,10 +5,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
 
-import "../interfaces/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-contract MyToken is ERC20 {
-    uint256 private constant MAX_UINT256 = 2**256 - 1;
+contract MyToken is IERC20 {
     mapping(address => uint256) public balances;
     mapping(address => mapping(address => uint256)) public allowed;
     uint256 public totalSupply;
@@ -30,19 +29,19 @@ contract MyToken is ERC20 {
     /**
      * @notice returns the total supply.
      */
-    function getTotalSupply() public view returns (uint256) {
+    function getTotalSupply() external view returns (uint256) {
         return totalSupply;
     }
 
     /**
      * @param tokenOwner address to view the balance.
      */
-    function balanceOf(address tokenOwner) public view returns (uint256) {
+    function balanceOf(address tokenOwner) external view returns (uint256) {
         return balances[tokenOwner];
     }
 
     function transfer(address _to, uint256 _value)
-        public
+        external
         enoughBalance(msg.sender, _value)
         returns (bool success)
     {
@@ -57,10 +56,10 @@ contract MyToken is ERC20 {
         address _to,
         uint256 _value
     )
-        public
+        external
         enoughBalance(_from, _value)
         enoughAllowance(_from, _value)
-        returns (bool success)
+        returns (bool)
     {
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
@@ -69,19 +68,16 @@ contract MyToken is ERC20 {
         return true;
     }
 
-    function approve(address _spender, uint256 _value)
-        public
-        returns (bool success)
-    {
+    function approve(address _spender, uint256 _value) public returns (bool) {
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
 
     function allowance(address _owner, address _spender)
-        public
+        external
         view
-        returns (uint256 remaining)
+        returns (uint256)
     {
         return allowed[_owner][_spender];
     }
