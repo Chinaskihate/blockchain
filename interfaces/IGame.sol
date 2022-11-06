@@ -5,6 +5,24 @@ pragma solidity >=0.6.0 <0.9.0;
 import "../libs/GameLogic.sol";
 
 interface IGame {
+    event GameEnded(
+        address indexed firstPlayer,
+        address indexed secondPlayer,
+        Result result
+    );
+
+    event BalanceIncreased(
+        address indexed sender,
+        address indexed opponent,
+        uint256 value
+    );
+
+    event BalanceDecreased(
+        address indexed sender,
+        address indexed opponent,
+        uint256 value
+    );
+
     function startGame(address _opponentAddress) external;
 
     function getRole(address _opponentAddress) external view returns (Role);

@@ -49,6 +49,7 @@ contract Game is IGame {
     {
         bets[msg.sender][_opponentAddress] = bets[msg.sender][_opponentAddress]
             .add(_bet);
+        emit BalanceIncreased(msg.sender, _opponentAddress, _bet);
     }
 
     function getBetBalance(address _opponentAddress)
@@ -102,6 +103,19 @@ contract Game is IGame {
         }
         if (results[msg.sender][_opponentAddress] != Result.NotEnded) {
             cleanMoves(_opponentAddress);
+            if (isSenderFirstPlayer) {
+                emit GameEnded(
+                    msg.sender,
+                    _opponentAddress,
+                    results[msg.sender][_opponentAddress]
+                );
+            } else {
+                emit GameEnded(
+                    _opponentAddress,
+                    msg.sender,
+                    results[msg.sender][_opponentAddress]
+                );
+            }
         }
     }
 
@@ -132,6 +146,7 @@ contract Game is IGame {
     {
         bets[msg.sender][_opponentAddress] = bets[msg.sender][_opponentAddress]
             .sub(_value);
+        emit BalanceDecreased(msg.sender, _opponentAddress, _value);
     }
 
     modifier tryTransferToken(address _to, uint256 _value) {
