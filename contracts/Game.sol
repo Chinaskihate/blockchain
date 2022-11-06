@@ -27,17 +27,24 @@ contract Game is IGame {
     function startGame(address _opponentAddress)
         external
         isGameStarted(_opponentAddress)
+        correctAddress(_opponentAddress)
     {
         roles[msg.sender][_opponentAddress] = Role.FirstPlayer;
         roles[_opponentAddress][msg.sender] = Role.SecondPlayer;
     }
 
-    function getRole(address _opponentAddress) external view returns (Role) {
+    function getRole(address _opponentAddress)
+        external
+        view
+        correctAddress(_opponentAddress)
+        returns (Role)
+    {
         return roles[msg.sender][_opponentAddress];
     }
 
     function bet(address _opponentAddress, uint256 _bet)
         external
+        correctAddress(_opponentAddress)
         tryTransferTokenFrom(msg.sender, address(this), _bet)
     {
         bets[msg.sender][_opponentAddress] = bets[msg.sender][_opponentAddress]
@@ -47,6 +54,7 @@ contract Game is IGame {
     function getBetBalance(address _opponentAddress)
         external
         view
+        correctAddress(_opponentAddress)
         returns (uint256)
     {
         return bets[msg.sender][_opponentAddress];
@@ -55,6 +63,7 @@ contract Game is IGame {
     function move(address _opponentAddress, Move _move)
         external
         correctMove(_move)
+        correctAddress(_opponentAddress)
         hasRole(_opponentAddress)
     {
         cleanResults(_opponentAddress);
@@ -99,6 +108,7 @@ contract Game is IGame {
     function getResult(address _opponentAddress)
         external
         view
+        correctAddress(_opponentAddress)
         returns (Result)
     {
         return results[msg.sender][_opponentAddress];
@@ -116,6 +126,7 @@ contract Game is IGame {
 
     function withdraw(address _opponentAddress, uint256 _value)
         external
+        correctAddress(_opponentAddress)
         enoughBetBalance(_opponentAddress, _value)
         tryTransferToken(msg.sender, _value)
     {
@@ -197,11 +208,19 @@ contract Game is IGame {
         _;
     }
 
+    modifier correctAddress(address _opponentAddress) {
+        require(
+            msg.sender != _opponentAddress,
+            "You cant play versus yourself!"
+        );
+        _;
+    }
+
     modifier isGameStarted(address _opponentAddress) {
         require(
             roles[msg.sender][_opponentAddress] == Role.NoRole ||
                 roles[_opponentAddress][msg.sender] == Role.NoRole,
-            "game already started"
+            "Game already started!"
         );
         _;
     }

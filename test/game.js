@@ -67,10 +67,15 @@ describe("Game.sol", () => {
       await game.connect(alice).startGame(bobAddress);
       await expect(
         game.connect(alice).startGame(bobAddress)
-      ).to.be.revertedWith("game already started");
+      ).to.be.revertedWith("Game already started!");
       await expect(
         game.connect(bob).startGame(aliceAddress)
-      ).to.be.revertedWith("game already started");
+      ).to.be.revertedWith("Game already started!");
+    });
+    it("should fail by starting vs yourself", async () => {
+      await expect(
+        game.connect(alice).startGame(aliceAddress)
+      ).to.be.revertedWith("You cant play versus yourself!");
     });
   });
 
@@ -108,6 +113,17 @@ describe("Game.sol", () => {
       await expect(game.connect(alice).bet(bobAddress, bet)).to.be.revertedWith(
         "Unknown error!"
       );
+    });
+    it("should fail by betting vs yourself", async () => {
+      await game.connect(alice).startGame(bobAddress);
+      let bet = 100;
+      await mockedMyToken.mock.transferFrom.reverts();
+      await mockedMyToken.mock.transferFrom
+        .withArgs(aliceAddress, game.address, bet)
+        .returns(true);
+      await expect(
+        game.connect(alice).bet(aliceAddress, bet)
+      ).to.be.revertedWith("You cant play versus yourself!");
     });
   });
 
@@ -250,6 +266,16 @@ describe("Game.sol", () => {
         game.connect(alice).move(bobAddress, Move.NoMove)
       ).to.be.revertedWith("Incorrect move!");
     });
+    it("should fail by moving vs yourself", async () => {
+      await game.connect(alice).startGame(bobAddress);
+      await mockedMyToken.mock.transferFrom.reverts();
+      await mockedMyToken.mock.transferFrom
+        .withArgs(aliceAddress, game.address, 0)
+        .returns(true);
+      await expect(game.connect(alice).bet(aliceAddress, 0)).to.be.revertedWith(
+        "You cant play versus yourself!"
+      );
+    });
   });
 
   describe("withdraw", () => {
@@ -288,6 +314,15 @@ describe("Game.sol", () => {
       await expect(
         game.connect(alice).withdraw(bobAddress, aliceBet)
       ).to.be.revertedWith("invoked");
+    });
+    it("should fail by withdraw vs yourself", async () => {
+      await game.connect(alice).startGame(bobAddress);
+      await mockedMyToken.mock.transferFrom.reverts();
+      await mockedMyToken.mock.transfer.withArgs(aliceAddress, 0).returns(true);
+
+      await expect(
+        game.connect(alice).withdraw(aliceAddress, 0)
+      ).to.be.revertedWith("You cant play versus yourself!");
     });
   });
 });
