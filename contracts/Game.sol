@@ -15,10 +15,10 @@ contract Game is IGame {
     using SafeMath for uint256;
     IERC20 tokenContract;
 
-    mapping(address => mapping(address => Role)) public roles;
-    mapping(address => mapping(address => uint256)) public bets;
-    mapping(address => mapping(address => Move)) public moves;
-    mapping(address => mapping(address => Result)) public results;
+    mapping(address => mapping(address => Role)) private roles;
+    mapping(address => mapping(address => uint256)) private bets;
+    mapping(address => mapping(address => Move)) private moves;
+    mapping(address => mapping(address => Result)) private results;
 
     constructor(IERC20 _tokenContract) {
         tokenContract = _tokenContract;
