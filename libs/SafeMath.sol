@@ -8,6 +8,13 @@ library SafeMath {
         return a - b;
     }
 
+    function min(uint256 a, uint256 b) internal pure returns (uint256) {
+        if (a <= b) {
+            return a;
+        }
+        return b;
+    }
+
     function add(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a + b;
         assert(c >= a);
