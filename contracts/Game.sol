@@ -1,7 +1,3 @@
-/**
- * @title MyToken - a simple example (ERC-20 compliant) token contract.
- */
-// contract Token is // https://eips.ethereum.org/EIPS/eip-20
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.6.0 <0.9.0;
 
